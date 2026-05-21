@@ -4,11 +4,11 @@ Execute este script UMA VEZ antes de rodar o app.py
 """
 
 import sqlite3
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash # Criptografar senha
 from config import Config
 
 print("="*60)
-print("🔧 SETUP DO BANCO DE DADOS (SQLite)")
+print("SETUP DO BANCO DE DADOS (SQLite)")
 print("="*60)
 
 try:
@@ -139,7 +139,7 @@ try:
         hoje = datetime.now()
         lotes = [
             (1, 'LOT2024001', (hoje + timedelta(days=180)).strftime('%Y-%m-%d'), 100),
-            (1, 'LOT2024002', (hoje + timedelta(days=25)).strftime('%Y-%m-%d'), 50),  # Vencendo!
+            (1, 'LOT2024002', (hoje + timedelta(days=25)).strftime('%Y-%m-%d'), 50),  # Vencendo
             (2, 'LOT2024003', (hoje + timedelta(days=365)).strftime('%Y-%m-%d'), 200),
             (3, 'LOT2024004', (hoje + timedelta(days=90)).strftime('%Y-%m-%d'), 30),
             (4, 'LOT2024005', (hoje + timedelta(days=120)).strftime('%Y-%m-%d'), 15),
@@ -174,12 +174,11 @@ try:
     conexao.close()
     
     print("\n" + "="*60)
-    print("✅ SETUP CONCLUÍDO COM SUCESSO!")
+    print("SETUP CONCLUÍDO!")
     print("="*60)
-    print("\n🚀 Próximos passos:")
+    print("\n Próximos passos:")
     print("   1. Execute: python app.py")
     print("   2. Acesse: http://localhost:5000")
-    print("   3. Login: admin / Senha: 123")
     print("\n" + "="*60)
 
 except Exception as e:

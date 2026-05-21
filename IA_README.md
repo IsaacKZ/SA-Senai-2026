@@ -61,7 +61,7 @@ Mantenha essas regras em mente para todas as próximas solicitações de código
 ---
 
 ## 1. STACK TECNOLÓGICA & ARQUITETURA
-- **Backend:** Python 3.x (Flask).
+- **Backend:** Python 3.x (Flask), PHP
 - **Database:** SQLite (arquivo `farmacia.db` - não requer servidor externo).
 - **Frontend:** HTML5 + Bootstrap 5 (CDN) + JavaScript (Vanilla/Puro).
 - **Estrutura de Pastas (MVC Adaptado):**

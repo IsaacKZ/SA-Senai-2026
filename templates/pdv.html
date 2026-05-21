@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}PDV - Ponto de Venda{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+
+    <!-- ===== LAYOUT SPLIT SCREEN ===== -->
+    <div class="row g-0 pdv-container">
+
+        <!-- ===== COLUNA ESQUERDA: CATÁLOGO DE PRODUTOS (60%) ===== -->
+        <div class="col-md-7 pdv-left">
+            <h3 class="mb-3">
+                <i class="bi bi-search"></i> Buscar Produtos
+            </h3>
+
+            <!-- Barra de Busca -->
+            <input type="text" id="busca-produto" class="pdv-search"
+                placeholder="Digite o nome do produto ou fabricante... (F2)" autofocus>
+
+            <!-- Grid de Produtos -->
+            <div id="grid-produtos">
+                {% if produtos %}
+                {% for produto in produtos %}
+                <div class="produto-card {% if produto.tem_desconto %}border-warning{% endif %}"
+                    data-nome="{{ produto.nome }}" data-fabricante="{{ produto.fabricante }}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <h5>{{ produto.nome }}</h5>
+                            <small class="text-muted">{{ produto.fabricante }}</small>
+
+                            <!-- Badge Controlado -->
+                            {% if produto.categoria == 'Controlado' %}
+                            <span class="badge badge-controlado d-block mt-2">
+                                <i class="bi bi-shield-exclamation"></i> Medicamento Controlado
+                            </span>
+                            {% endif %}
+
+                            <!-- Badge DESCONTO (Produto Vencendo) -->
+                            {% if produto.tem_desconto %}
+                            <div class="mt-2">
+                                <span class="badge bg-danger fs-6 animate__animated animate__pulse animate__infinite">
+                                    🏷️ -{{ produto.percentual_desconto }}% PROMOÇÃO
+                                </span>
+                                <br>
+                                <small class="text-muted">Vence em {{ produto.dias_para_vencer }} dias</small>
+                            </div>
+                            {% endif %}
+
+                            <div class="mt-2">
+                                {% if produto.tem_desconto %}
+                                <span class="text-decoration-line-through text-muted">R$ {{
+                                    "%.2f"|format(produto.preco_original) }}</span>
+                                <span class="preco text-danger fw-bold fs-4">R$ {{ "%.2f"|format(produto.preco_venda)
+                                    }}</span>
+                                {% else %}
+                                <span class="preco">R$ {{ "%.2f"|format(produto.preco_venda) }}</span>
+                                {% endif %}
+                                <br>
+                                <small class="text-secondary">
+                                    <i class="bi bi-box"></i> Estoque: {{ produto.estoque_total }}
+                                </small>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-success btn-adicionar-produto" data-produto-id="{{ produto.id }}"
+                            data-produto-nome="{{ produto.nome }}" data-produto-preco="{{ produto.preco_venda }}"
+                            data-produto-categoria="{{ produto.categoria }}"
+                            data-produto-estoque="{{ produto.estoque_total }}">
+                            <i class="bi bi-plus-circle"></i> Adicionar
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Nenhum produto disponível no estoque.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ===== COLUNA DIREITA: CARRINHO/CAIXA (40%) ===== -->
+        <div class="col-md-5 pdv-right">
+            <h3 class="mb-4">
+                <i class="bi bi-cart-fill"></i> Carrinho de Compras
+            </h3>
+
+            <!-- Lista de Itens do Carrinho -->
+            <div class="carrinho-lista" id="lista-carrinho">
+                <p class="text-center text-muted">Carrinho vazio</p>
+            </div>
+
+            <!-- Total da Venda -->
+            <div class="carrinho-total">
+                <h6 class="mb-1">TOTAL</h6>
+                <h2 id="total-venda">R$ 0,00</h2>
+            </div>
+
+            <!-- Botões de Ação -->
+            <button class="btn btn-finalizar mb-2" id="btn-finalizar-venda" onclick="finalizarVenda()" disabled>
+                <i class="bi bi-check-circle"></i> FINALIZAR VENDA (F12)
+            </button>
+
+            <button class="btn btn-outline-danger w-100" onclick="cancelarVenda()">
+                <i class="bi bi-x-circle"></i> Cancelar (ESC)
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ===== MODAL: MEDICAMENTO CONTROLADO ===== -->
+<div class="modal fade modal-controlado" id="modalControlado" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-shield-exclamation"></i> Medicamento Controlado
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <strong>Atenção!</strong> Este medicamento requer autorização especial.
+                </div>
+
+                <h6>Produto: <strong id="nome-produto-controlado"></strong></h6>
+
+                <hr>
+
+                <div class="mb-3">
+                    <label for="receita-upload" class="form-label">
+                        <i class="bi bi-file-earmark-medical"></i> Upload da Receita Médica *
+                    </label>
+                    <input type="file" class="form-control" id="receita-upload" accept=".pdf,.jpg,.jpeg,.png" required>
+                    <small class="text-muted">Formatos aceitos: PDF, JPG, PNG (máx. 5MB)</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="senha-supervisor" class="form-label">
+                        <i class="bi bi-lock-fill"></i> Senha do Supervisor *
+                    </label>
+                    <input type="password" class="form-control" id="senha-supervisor"
+                        placeholder="Digite a senha do farmacêutico responsável" required>
+                </div>
+
+                <!-- Checkbox: Mostrar Senha -->
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="mostrar-senha-supervisor">
+                    <label class="form-check-label" for="mostrar-senha-supervisor">
+                        <i class="bi bi-eye" id="icon-senha-supervisor"></i> Mostrar senha
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-warning" onclick="confirmarControlado()">
+                    <i class="bi bi-check-circle"></i> Confirmar e Adicionar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Script PDV Logic -->
+<script src="{{ url_for('static', filename='js/pdv_logic.js') }}"></script>
+
+<!-- Script: Toggle Senha Supervisor -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('mostrar-senha-supervisor').addEventListener('change', function () {
+            const senhaInput = document.getElementById('senha-supervisor');
+            const icon = document.getElementById('icon-senha-supervisor');
+
+            if (this.checked) {
+                senhaInput.type = 'text';
+                icon.className = 'bi bi-eye-slash';
+            } else {
+                senhaInput.type = 'password';
+                icon.className = 'bi bi-eye';
+            }
+        });
+    });
+</script>
+{% endblock %}

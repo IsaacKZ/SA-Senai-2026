@@ -142,8 +142,8 @@ def dashboard():
         vendas_recentes = db.get_vendas_recentes(limite=5)
         
         return render_template('dashboard.html', 
-                             lotes_vencendo=lotes_vencendo,
-                             vendas_recentes=vendas_recentes)
+            lotes_vencendo=lotes_vencendo,
+            vendas_recentes=vendas_recentes)
     except Exception as e:
         flash(f'Erro ao carregar dashboard: {str(e)}', 'danger')
         return render_template('dashboard.html', lotes_vencendo=[], vendas_recentes=[])
@@ -171,7 +171,7 @@ def produtos():
 def criar_produto():
     """
     API para criar novo produto.
-    Retorna JSON para consumo via AJAX.
+    Retorna JSON para consumo
     """
     try:
         nome = request.form.get('nome')
@@ -427,8 +427,8 @@ def relatorios():
         lotes_vencendo = db.get_lotes_vencendo()
         
         return render_template('relatorios.html', 
-                             vendas=vendas_recentes,
-                             lotes_vencendo=lotes_vencendo)
+            vendas=vendas_recentes,
+            lotes_vencendo=lotes_vencendo)
     except Exception as e:
         flash(f'Erro ao carregar relatórios: {str(e)}', 'danger')
         return render_template('relatorios.html', vendas=[], lotes_vencendo=[])
@@ -458,12 +458,11 @@ if __name__ == '__main__':
     os.makedirs('static/js', exist_ok=True)
     
     print("\n" + "="*50)
-    print("🏥 SISTEMA DE GESTÃO FARMACÊUTICA")
+    print("SISTEMA DE GESTÃO FARMACÊUTICA")
     print("="*50)
-    print(f"🔒 Secret Key configurada: {'✓' if app.config['SECRET_KEY'] else '✗'}")
-    print(f"🗄️  Banco de dados: {Config.DATABASE_PATH}")
+    print(f"Banco de dados: {Config.DATABASE_PATH}")
     print("="*50)
-    print("🚀 Servidor iniciado em: http://localhost:5000")
+    print("Servidor iniciado em: http://localhost:5000")
     print("="*50 + "\n")
     
     app.run(debug=Config.DEBUG, host='0.0.0.0', port=5000)

@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid fade-in">
+
+    <!-- ===== CABEÇALHO DO DASHBOARD ===== -->
+    <div class="dashboard-header">
+        <h1 class="mb-2">
+            <i class="bi bi-speedometer2"></i> Dashboard - Visão Geral
+        </h1>
+        <p class="mb-0">Bem-vindo ao sistema de gestão da Farmácia Vida Saudável</p>
+    </div>
+
+    <!-- ===== ALERTA DE VALIDADE ===== -->
+    {% if lotes_vencendo %}
+    <div class="alert-validade">
+        <h4>
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            ATENÇÃO: Lotes com Validade Próxima do Vencimento!
+        </h4>
+        <p class="mb-3">Os seguintes lotes vencem nos próximos 30 dias. Tome providências!</p>
+
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-danger">
+                    <tr>
+                        <th>Produto</th>
+                        <th>Fabricante</th>
+                        <th>Nº Lote</th>
+                        <th>Data de Validade</th>
+                        <th>Dias Restantes</th>
+                        <th>Quantidade</th>
+                    </tr>
+                </thead>
+                <tbody id="lotes-tbody">
+                    {% for lote in lotes_vencendo %}
+                    <tr
+                        class="{% if lote.dias_para_vencer <= 7 %}table-danger-custom{% endif %} {% if loop.index > 5 %}lote-extra d-none{% endif %}">
+                        <td><strong>{{ lote.produto_nome }}</strong></td>
+                        <td>{{ lote.fabricante }}</td>
+                        <td>{{ lote.numero_lote }}</td>
+                        <td>{{ lote.data_validade|format_date }}</td>
+                        <td>
+                            <span class="badge badge-vencendo">
+                                {{ lote.dias_para_vencer }} dia(s)
+                            </span>
+                        </td>
+                        <td>{{ lote.qtd_atual }} un.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Botão Ver Todos (aparece apenas se tiver mais de 5 lotes) -->
+        {% if lotes_vencendo|length > 5 %}
+        <div class="text-center mt-3">
+            <button class="btn btn-outline-danger" id="btn-toggle-lotes" onclick="toggleLotesVencendo()">
+                <i class="bi bi-chevron-down" id="icon-toggle-lotes"></i>
+                <span id="text-toggle-lotes">Ver todos ({{ lotes_vencendo|length }} lotes)</span>
+            </button>
+        </div>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="alert alert-success">
+        <i class="bi bi-check-circle-fill"></i>
+        <strong>Tudo certo!</strong> Não há lotes vencendo nos próximos 30 dias.
+    </div>
+    {% endif %}
+
+    <!-- ===== CARDS DE ATALHO ===== -->
+    <div class="row mt-4">
+        <!-- Card: Vendas -->
+        <div class="col-md-4 mb-4">
+            <a href="{{ url_for('pdv') }}" class="text-decoration-none">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <i class="bi bi-cart-fill text-primary-custom"></i>
+                        <h3>PDV</h3>
+                        <p class="text-muted">Ponto de Venda</p>
+                        <button class="btn btn-primary">
+                            <i class="bi bi-arrow-right-circle"></i> Acessar
+                        </button>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Card: Estoque -->
+        <div class="col-md-4 mb-4">
+            <a href="{{ url_for('produtos') }}" class="text-decoration-none">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <i class="bi bi-box-seam text-secondary-custom"></i>
+                        <h3>Estoque</h3>
+                        <p class="text-muted">Produtos e Lotes</p>
+                        <button class="btn btn-success">
+                            <i class="bi bi-arrow-right-circle"></i> Gerenciar
+                        </button>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Card: Relatórios -->
+        <div class="col-md-4 mb-4">
+            <a href="{{ url_for('relatorios') }}" class="text-decoration-none">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <i class="bi bi-file-earmark-bar-graph text-warning"></i>
+                        <h3>Relatórios</h3>
+                        <p class="text-muted">Análises</p>
+                        <button class="btn btn-warning">
+                            <i class="bi bi-arrow-right-circle"></i> Ver
+                        </button>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- ===== ÚLTIMAS VENDAS ===== -->
+    {% if vendas_recentes %}
+    <div class="card mt-4">
+        <div class="card-header">
+            <i class="bi bi-clock-history"></i> Últimas Vendas
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#ID</th>
+                            <th>Data/Hora</th>
+                            <th>Vendedor</th>
+                            <th>Total</th>
+                            <th>Supervisor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for venda in vendas_recentes %}
+                        <tr>
+                            <td><strong>#{{ venda.id }}</strong></td>
+                            <td>{{ venda.data_venda|format_datetime }}</td>
+                            <td>{{ venda.vendedor }}</td>
+                            <td><strong class="text-success">R$ {{ "%.2f"|format(venda.total) }}</strong></td>
+                            <td>
+                                {% if venda.supervisor_liberacao %}
+                                <span class="badge bg-warning">Controlado</span>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Toggle para mostrar/ocultar todos os lotes vencendo
+    let lotesExpanded = false;
+
+    function toggleLotesVencendo() {
+        const lotesExtras = document.querySelectorAll('.lote-extra');
+        const icon = document.getElementById('icon-toggle-lotes');
+        const text = document.getElementById('text-toggle-lotes');
+        const totalLotes = Number("{{ lotes_vencendo|length }}");
+
+        if (lotesExpanded) {
+            // Recolher
+            lotesExtras.forEach(lote => lote.classList.add('d-none'));
+            icon.className = 'bi bi-chevron-down';
+            text.textContent = `Ver todos (${totalLotes} lotes)`;
+            lotesExpanded = false;
+        } else {
+            // Expandir
+            lotesExtras.forEach(lote => lote.classList.remove('d-none'));
+            icon.className = 'bi bi-chevron-up';
+            text.textContent = 'Ver menos';
+            lotesExpanded = true;
+        }
+    }
+</script>
+{% endblock %}

@@ -26,6 +26,7 @@ class Config:
     # ========================================
     # CONFIGURAÇÕES DO BANCO DE DADOS (SQLite)
     # ========================================
+
     # Caminho do arquivo do banco SQLite
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     DATABASE_PATH = os.path.join(BASE_DIR, 'farmacia.db')
@@ -48,6 +49,7 @@ class Config:
     # ========================================
     # FUNÇÕES AUXILIARES
     # ========================================
+    
     @staticmethod
     def allowed_file(filename):
         """Verifica se a extensão do arquivo é permitida."""
