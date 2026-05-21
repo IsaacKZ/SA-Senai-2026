@@ -1,8 +1,8 @@
-# 🏥 Sistema de Farmácia "Vida Saudável" - SENAI
+# Sistema de Farmácia "Vida Saudável" - SENAI
 
-Sistema de gerenciamento de farmácia desenvolvido em Python/Flask com SQLite.
+Sistema de gerenciamento de farmácia desenvolvido em Python/Flask e PHP com SQLite.
 
-## 🚀 Funcionalidades
+## Funcionalidades
 
 - **Autenticação**: Login com dropdown de usuários e hash de senhas.
 - **Dashboard**: Visão geral com alertas de validade e últimas vendas.
@@ -16,14 +16,16 @@ Sistema de gerenciamento de farmácia desenvolvido em Python/Flask com SQLite.
   - Cadastro de lotes com controle de validade.
   - **RN2**: Alertas automáticos para lotes vencendo em 30 dias.
 - **Relatórios**: Histórico de vendas e lotes críticos.
+- **Help Desk**
+  - Abrir chamados sobre problemas/sugestões
 
-## 🛠️ Tecnologias
+## Tecnologias
 
-- **Backend**: Python 3.x, Flask
+- **Backend**: Python 3.x, Flask, PHP
 - **Banco de Dados**: SQLite (arquivo `farmacia.db`)
 - **Frontend**: HTML5, CSS3, Bootstrap 5, JavaScript
 
-## ⚙️ Instalação
+## Instalação
 
 ### 1. Instalar dependências
 ```bash
@@ -42,7 +44,7 @@ python app.py
 
 Acesse: **http://localhost:5000**
 
-## 🔐 Credenciais
+## Credenciais
 
 ### Usuários do Sistema
 | Login | Nome | Cargo | Senha |
@@ -55,4 +57,4 @@ Acesse: **http://localhost:5000**
 - **Senha Mestra**: `farmacia_VS`
 
 ---
-Desenvolvido para avaliação acadêmica - SENAI 2025.
+Desenvolvido para avaliação acadêmica - SENAI 2026.
