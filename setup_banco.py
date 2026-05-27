@@ -28,7 +28,7 @@ try:
             nome TEXT NOT NULL,
             login TEXT UNIQUE NOT NULL,
             senha_hash TEXT NOT NULL,
-            cargo TEXT CHECK(cargo IN ('Atendente', 'Farmaceutico', 'Gerente')) NOT NULL,
+            cargo TEXT CHECK(cargo IN ('Atendente', 'Farmaceutico', 'Gerente', 'Admin')) NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
@@ -93,23 +93,30 @@ try:
     """)
     print("   ✅ Tabela 'itens_venda' criada!")
     
-    # 3. Criar usuário admin
-    print("\n3️⃣ Criando usuário administrador...")
-    
-    cursor.execute("SELECT COUNT(*) FROM usuarios WHERE login = 'admin'")
-    existe = cursor.fetchone()[0]
-    
-    if existe > 0:
-        print("   ⚠️  Usuário 'admin' já existe. Pulando...")
-    else:
-        senha_hash = generate_password_hash('123')
+    # 3. Criar usuários do sistema
+    print("\n3️⃣ Criando usuários do sistema...")
+
+    usuarios = [
+        ('Fernanda Castro', 'fernanda', '12345678', 'Gerente'),
+        ('Bruno Alves', 'bruno', '12345678', 'Farmaceutico'),
+        ('Tânia Lima', 'tania', '12345678', 'Atendente'),
+        ('Admin', 'admin', '12345678', 'Gerente'),
+    ]
+
+    for nome, login, senha, cargo in usuarios:
+        cursor.execute("SELECT COUNT(*) FROM usuarios WHERE login = ?", (login,))
+        existe = cursor.fetchone()[0]
+
+        if existe > 0:
+            print(f"   ⚠️  Usuário '{login}' já existe. Pulando...")
+            continue
+
+        senha_hash = generate_password_hash(senha)
         cursor.execute("""
             INSERT INTO usuarios (nome, login, senha_hash, cargo)
             VALUES (?, ?, ?, ?)
-        """, ('Administrador do Sistema', 'admin', senha_hash, 'Gerente'))
-        print("   ✅ Usuário 'admin' criado!")
-        print("      Login: admin")
-        print("      Senha: 123")
+        """, (nome, login, senha_hash, cargo))
+        print(f"   ✅ Usuário '{login}' criado!")
     
     # 4. Inserir alguns produtos de exemplo
     print("\n4️⃣ Inserindo produtos de exemplo...")
