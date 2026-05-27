@@ -52,6 +52,7 @@ Acesse: **http://localhost:5000**
 | fernanda | Fernanda Castro | Gerente | 12345678 |
 | bruno | Bruno Alves | Farmacêutico | 12345678 |
 | tania | Tânia Lima | Atendente | 12345678 |
+| admin | Admin | Gerente | 12345678 |
 
 ### Senha do Supervisor (Medicamentos Controlados)
 - **Senha Mestra**: `farmacia_VS`
