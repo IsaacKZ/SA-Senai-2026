@@ -37,7 +37,7 @@ Arquivos importantes:
 - `static/css/style.css`: CSS principal do sistema.
 - `static/js/pdv_logic.js`: JavaScript do PDV.
 - `php/conexao.php`: conexao PHP com o mesmo banco `farmacia.db`.
-- `php/help_desk/`: pasta criada para o modulo Help Desk em PHP.
+- `php/help_desk/`: pasta oficial do modulo Help Desk em PHP.
 
 O Flask e o PHP devem conviver no mesmo projeto, mas um nao executa o outro automaticamente.
 
@@ -71,7 +71,7 @@ Para testar PHP, posso usar:
 php -S localhost:8000 -t .
 ```
 
-Atencao: atualmente existe a pasta `php/help_desk`, mas o link criado na navbar aponta para `/php/helpdesk/index.php`. Antes de criar as telas, preciso padronizar isso. Nao decida sozinho sem me perguntar.
+Atencao: a pasta oficial ficou `php/help_desk`. O link da navbar deve apontar para `http://localhost:8000/php/help_desk/index.php` quando o servidor PHP estiver rodando na porta 8000.
 
 ---
 
@@ -181,7 +181,7 @@ O item usa o icone:
 <i class="bi bi-headset"></i> Help Desk
 ```
 
-Ainda precisamos ajustar o link quando a pasta/pagina PHP final estiver definida.
+O link foi ajustado para `http://localhost:8000/php/help_desk/index.php`.
 
 ---
 
@@ -259,6 +259,15 @@ CREATE TABLE chamados (
 Nao adicione campos como `categoria`, `comentarios_chamado`, `anexos` ou historico sem me perguntar antes.
 
 Talvez isso seja feito depois, mas agora eu quero seguir a modelagem inicial.
+
+O MVP funcional do Help Desk ja foi criado com:
+
+- `php/help_desk/index.php`: lista chamados e mostra contadores por status;
+- `php/help_desk/novo_chamado.php`: formulario para abrir chamado;
+- `php/help_desk/salvar_chamado.php`: grava chamado no banco;
+- `php/help_desk/detalhes_chamado.php`: mostra detalhes e formulario de atualizacao;
+- `php/help_desk/atualizar_chamado.php`: atualiza status/prioridade e fecha chamado quando status for `Fechado`;
+- `php/help_desk/funcoes.php`: funcoes de layout, escape HTML e badges.
 
 ---
 
@@ -344,7 +353,7 @@ $stmt = $pdo->query("SELECT * FROM usuarios");
 $usuarios = $stmt->fetchAll();
 ```
 
-Atencao: no ambiente atual, o PHP tem `PDO`, mas nao tem `pdo_sqlite` habilitado. Para a conexao funcionar de verdade, preciso habilitar essa extensao.
+Atencao: o `pdo_sqlite` foi habilitado no PHP deste computador. Se o projeto for levado para outro computador, talvez seja necessario habilitar `pdo_sqlite` de novo no `php.ini`.
 
 ---
 
@@ -352,13 +361,10 @@ Atencao: no ambiente atual, o PHP tem `PDO`, mas nao tem `pdo_sqlite` habilitado
 
 Coisas que ainda precisam ser resolvidas:
 
-- padronizar `php/help_desk` vs `php/helpdesk`;
-- ajustar o link da navbar depois dessa decisao;
-- habilitar `pdo_sqlite` no PHP;
-- criar a tabela `chamados`;
-- decidir se a tabela sera criada pelo `setup_banco.py` ou por um script PHP;
+- melhorar a organizacao da mensagem da tabela `chamados` no `setup_banco.py`, pois ela aparece dentro da etapa de usuarios;
 - decidir como o PHP vai identificar o usuario logado;
-- criar as telas PHP do Help Desk;
+- criar validacoes visuais melhores no formulario de atualizacao;
+- decidir se sera necessario login proprio no PHP;
 - revisar textos antigos com encoding quebrado.
 
 ---
@@ -368,4 +374,3 @@ Coisas que ainda precisam ser resolvidas:
 Este projeto comecou como uma S.A. de farmacia no segundo semestre, feita em Flask com SQLite. Ele controla usuarios, produtos, lotes, validade, vendas e regras para medicamentos controlados.
 
 No terceiro semestre, estou estendendo esse mesmo sistema com um modulo de Help Desk em PHP. O objetivo e mostrar continuidade do projeto, reaproveitando o banco, o visual e a estrutura ja existente, mas adicionando uma nova funcionalidade.
-

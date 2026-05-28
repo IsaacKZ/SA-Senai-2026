@@ -13,13 +13,13 @@ print("="*60)
 
 try:
     # 1. Conectar/Criar banco SQLite
-    print(f"\n1️⃣ Criando banco em: {Config.DATABASE_PATH}")
+    print(f"\n1. Criando banco em: {Config.DATABASE_PATH}")
     conexao = sqlite3.connect(Config.DATABASE_PATH)
     cursor = conexao.cursor()
-    print("   ✅ Conectado ao SQLite!")
+    print("   OK - Conectado ao SQLite!")
     
     # 2. Criar tabelas
-    print("\n2️⃣ Criando tabelas...")
+    print("\n2. Criando tabelas...")
     
     # Tabela: usuarios
     cursor.execute("""
@@ -32,7 +32,7 @@ try:
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
-    print("   ✅ Tabela 'usuarios' criada!")
+    print("   OK - Tabela 'usuarios' criada!")
     
     # Tabela: produtos
     cursor.execute("""
@@ -46,7 +46,7 @@ try:
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
-    print("   ✅ Tabela 'produtos' criada!")
+    print("   OK - Tabela 'produtos' criada!")
     
     # Tabela: estoque_lotes
     cursor.execute("""
@@ -60,7 +60,7 @@ try:
             FOREIGN KEY (produto_id) REFERENCES produtos(id) ON DELETE CASCADE
         )
     """)
-    print("   ✅ Tabela 'estoque_lotes' criada!")
+    print("   OK - Tabela 'estoque_lotes' criada!")
     
     # Tabela: vendas
     cursor.execute("""
@@ -74,7 +74,7 @@ try:
             FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
         )
     """)
-    print("   ✅ Tabela 'vendas' criada!")
+    print("   OK - Tabela 'vendas' criada!")
     
     # Tabela: itens_venda
     cursor.execute("""
@@ -91,10 +91,28 @@ try:
             FOREIGN KEY (lote_id) REFERENCES estoque_lotes(id)
         )
     """)
-    print("   ✅ Tabela 'itens_venda' criada!")
+    print("   OK - Tabela 'itens_venda' criada!")
     
-    # 3. Criar usuários do sistema
-    print("\n3️⃣ Criando usuários do sistema...")
+    # 3. Criar chamados e usuários do sistema
+    print("\n3. Criando chamados e usuários do sistema...")
+
+    # Tabela: chamados do Help Desk
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS chamados (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            titulo VARCHAR(100) NOT NULL,
+            descricao TEXT NOT NULL,
+            data_aberto DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            data_fechado DATETIME DEFAULT NULL,
+            prioridade TEXT CHECK(prioridade IN ('Baixa', 'Media', 'Alta')) NOT NULL,
+            status TEXT CHECK(status IN ('Aberto', 'Em andamento', 'Resolvido', 'Fechado')) NOT NULL DEFAULT 'Aberto',
+            aberto_por_id INTEGER NOT NULL,
+            fechado_por_id INTEGER DEFAULT NULL,
+            FOREIGN KEY (aberto_por_id) REFERENCES usuarios(id),
+            FOREIGN KEY (fechado_por_id) REFERENCES usuarios(id)
+        )
+    """)
+    print("   Tabela 'chamados' criada!")
 
     usuarios = [
         ('Fernanda Castro', 'fernanda', '12345678', 'Gerente'),
@@ -108,7 +126,7 @@ try:
         existe = cursor.fetchone()[0]
 
         if existe > 0:
-            print(f"   ⚠️  Usuário '{login}' já existe. Pulando...")
+            print(f"   Aviso - Usuário '{login}' já existe. Pulando...")
             continue
 
         senha_hash = generate_password_hash(senha)
@@ -116,10 +134,10 @@ try:
             INSERT INTO usuarios (nome, login, senha_hash, cargo)
             VALUES (?, ?, ?, ?)
         """, (nome, login, senha_hash, cargo))
-        print(f"   ✅ Usuário '{login}' criado!")
+        print(f"   OK - Usuário '{login}' criado!")
     
     # 4. Inserir alguns produtos de exemplo
-    print("\n4️⃣ Inserindo produtos de exemplo...")
+    print("\n4. Inserindo produtos de exemplo...")
     
     cursor.execute("SELECT COUNT(*) FROM produtos")
     if cursor.fetchone()[0] == 0:
@@ -137,10 +155,10 @@ try:
                 INSERT INTO produtos (nome, fabricante, categoria, preco_venda, descricao)
                 VALUES (?, ?, ?, ?, ?)
             """, p)
-        print(f"   ✅ {len(produtos)} produtos inseridos!")
+        print(f"   OK - {len(produtos)} produtos inseridos!")
         
         # Inserir lotes para os produtos
-        print("\n5️⃣ Inserindo lotes de exemplo...")
+        print("\n5. Inserindo lotes de exemplo...")
         from datetime import datetime, timedelta
         
         hoje = datetime.now()
@@ -159,24 +177,27 @@ try:
                 INSERT INTO estoque_lotes (produto_id, numero_lote, data_validade, qtd_atual)
                 VALUES (?, ?, ?, ?)
             """, l)
-        print(f"   ✅ {len(lotes)} lotes inseridos!")
+        print(f"   OK - {len(lotes)} lotes inseridos!")
     else:
-        print("   ⚠️  Produtos já existem. Pulando...")
+        print("   Aviso - Produtos já existem. Pulando...")
     
     # 5. Commit
     conexao.commit()
     
     # 6. Verificação final
-    print("\n6️⃣ Verificação final...")
+    print("\n6. Verificação final...")
     cursor.execute("SELECT COUNT(*) FROM usuarios")
-    print(f"   ✅ {cursor.fetchone()[0]} usuário(s) cadastrado(s)")
+    print(f"   OK - {cursor.fetchone()[0]} usuário(s) cadastrado(s)")
     
     cursor.execute("SELECT COUNT(*) FROM produtos")
-    print(f"   ✅ {cursor.fetchone()[0]} produto(s) cadastrado(s)")
+    print(f"   OK - {cursor.fetchone()[0]} produto(s) cadastrado(s)")
     
     cursor.execute("SELECT COUNT(*) FROM estoque_lotes")
-    print(f"   ✅ {cursor.fetchone()[0]} lote(s) cadastrado(s)")
+    print(f"   OK - {cursor.fetchone()[0]} lote(s) cadastrado(s)")
     
+    cursor.execute("SELECT COUNT(*) FROM chamados")
+    print(f"   {cursor.fetchone()[0]} chamado(s) cadastrado(s)")
+
     cursor.close()
     conexao.close()
     
@@ -189,6 +210,6 @@ try:
     print("\n" + "="*60)
 
 except Exception as e:
-    print(f"\n❌ ERRO: {e}")
+    print(f"\nERRO: {e}")
     import traceback
     traceback.print_exc()

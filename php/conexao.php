@@ -4,7 +4,6 @@
 
     try {
         // Cria a conexao com o banco SQLite.
-        // Diferente do MySQL, o SQLite nao usa host, usuario ou senha.
         $pdo = new PDO("sqlite:" . $caminhoBanco);
 
         // Se der erro em alguma consulta SQL, o PDO lanca uma excecao.
