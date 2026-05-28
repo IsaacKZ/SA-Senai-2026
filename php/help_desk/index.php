@@ -2,6 +2,8 @@
     require_once __DIR__ . "/../conexao.php";
     require_once __DIR__ . "/funcoes.php";
 
+    exigir_login_php();
+
     // Status aceitos pelo banco. Qualquer outro valor na URL e ignorado.
     $statusValidos = ["Aberto", "Em andamento", "Resolvido", "Fechado"];
     $statusSelecionado = $_GET["status"] ?? "";

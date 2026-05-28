@@ -20,6 +20,20 @@ app = Flask(__name__)
 app.config.from_object(Config)
 Config.init_app(app)
 
+@app.after_request
+def permitir_help_desk_php(response):
+    """Permite que o Help Desk em PHP consulte a sessao Flask pelo navegador."""
+    origem = request.headers.get('Origin')
+    origens_permitidas = {'http://localhost:8000', 'http://127.0.0.1:8000'}
+
+    if origem in origens_permitidas:
+        response.headers['Access-Control-Allow-Origin'] = origem
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+
+    return response
+
 # =====================================================
 # FILTRO JINJA PARA DATAS (SQLite retorna strings)
 # =====================================================
@@ -117,6 +131,19 @@ def logout():
 # =====================================================
 # ROTAS: NAVEGAÇÃO PRINCIPAL
 # =====================================================
+
+@app.route('/api/sessao')
+def api_sessao():
+    """Retorna os dados basicos do usuario logado para o modulo PHP."""
+    if 'user_id' not in session:
+        return jsonify({'logado': False}), 401
+
+    return jsonify({
+        'logado': True,
+        'id': session['user_id'],
+        'nome': session['user_nome'],
+        'cargo': session['user_cargo']
+    })
 
 @app.route('/')
 def index():

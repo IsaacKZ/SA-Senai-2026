@@ -1,5 +1,8 @@
 <?php
     require_once __DIR__ . "/../conexao.php";
+    require_once __DIR__ . "/funcoes.php";
+
+    exigir_login_php();
 
     // Quando falta o ID do chamado, nao ha como voltar para a tela correta.
     function voltar_para_lista() {
@@ -25,7 +28,7 @@
     $chamadoId = filter_input(INPUT_POST, "id", FILTER_VALIDATE_INT);
     $status = $_POST["status"] ?? "";
     $prioridade = $_POST["prioridade"] ?? "";
-    $fechadoPorId = filter_input(INPUT_POST, "fechado_por_id", FILTER_VALIDATE_INT);
+    $fechadoPorId = (int) $_SESSION["user_id"];
 
     $statusValidos = ["Aberto", "Em andamento", "Resolvido", "Fechado"];
     $prioridadesValidas = ["Baixa", "Media", "Alta"];
@@ -36,11 +39,6 @@
     }
 
     if (!in_array($status, $statusValidos, true) || !in_array($prioridade, $prioridadesValidas, true)) {
-        voltar_para_chamado($chamadoId);
-    }
-
-    // Para fechar um chamado, e obrigatorio informar quem fechou.
-    if ($status === "Fechado" && !$fechadoPorId) {
         voltar_para_chamado($chamadoId);
     }
 

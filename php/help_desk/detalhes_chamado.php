@@ -2,6 +2,8 @@
     require_once __DIR__ . "/../conexao.php";
     require_once __DIR__ . "/funcoes.php";
 
+    exigir_login_php();
+
     // ID do chamado vindo pela URL.
     $chamadoId = filter_input(INPUT_GET, "id", FILTER_VALIDATE_INT);
 
@@ -28,11 +30,6 @@
         header("Location: index.php?msg=erro");
         exit;
     }
-
-    // Lista de usuarios usada no select "Fechado por".
-    $usuarios = $pdo
-        ->query("SELECT id, nome, cargo FROM usuarios ORDER BY nome ASC")
-        ->fetchAll();
 
     $statusPermitidos = ["Aberto", "Em andamento", "Resolvido", "Fechado"];
     $prioridadesPermitidas = ["Baixa", "Media", "Alta"];
@@ -123,16 +120,11 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="fechado_por_id" class="form-label">Fechado por</label>
-                        <select class="form-select" id="fechado_por_id" name="fechado_por_id">
-                            <option value="">Nao fechado</option>
-                            <?php foreach ($usuarios as $usuario): ?>
-                                <option value="<?php echo escapar($usuario["id"]); ?>" <?php echo (int) $usuario["id"] === (int) ($chamado["fechado_por_id"] ?? 0) ? "selected" : ""; ?>>
-                                    <?php echo escapar($usuario["nome"]); ?> (<?php echo escapar($usuario["cargo"]); ?>)
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <small class="text-muted">Obrigatorio quando o status for Fechado.</small>
+                        <label class="form-label">Usuario atual</label>
+                        <div class="form-control bg-light">
+                            <?php echo escapar($_SESSION["user_nome"]); ?> (<?php echo escapar($_SESSION["user_cargo"]); ?>)
+                        </div>
+                        <small class="text-muted">Ao fechar o chamado, este usuario sera registrado como responsavel.</small>
                     </div>
 
                     <button type="submit" class="btn btn-success w-100">

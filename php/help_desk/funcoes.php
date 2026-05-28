@@ -1,10 +1,25 @@
 <?php
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
     // Endereco do sistema Flask. O modulo PHP usa esses links para voltar ao sistema principal.
     const URL_SISTEMA_FLASK = "http://localhost:5000";
 
     // Evita que textos vindos do banco sejam interpretados como HTML na tela.
     function escapar($valor) {
         return htmlspecialchars((string) $valor, ENT_QUOTES, "UTF-8");
+    }
+
+    function usuario_logado_php() {
+        return !empty($_SESSION["user_id"]);
+    }
+
+    function exigir_login_php() {
+        if (!usuario_logado_php()) {
+            header("Location: sincronizar_sessao.php");
+            exit;
+        }
     }
 
     // Padroniza a exibicao das datas do SQLite.
@@ -121,10 +136,20 @@
                     </li>
                 </ul>
 
-                <span class="text-white me-3">
-                    <i class="bi bi-code-slash"></i>
-                    Modulo PHP
-                </span>
+                <?php if (usuario_logado_php()): ?>
+                    <div class="d-flex align-items-center">
+                        <span class="text-white me-3">
+                            <i class="bi bi-person-circle"></i>
+                            Ola, <strong><?php echo escapar($_SESSION["user_nome"]); ?></strong>
+                            <span class="badge bg-light text-dark ms-1"><?php echo escapar($_SESSION["user_cargo"]); ?></span>
+                        </span>
+                        <a href="sair.php" class="btn btn-logout">
+                            <i class="bi bi-box-arrow-right"></i> Sair
+                        </a>
+                    </div>
+                <?php else: ?>
+                    <span class="text-white me-3">Sincronizando sessao...</span>
+                <?php endif; ?>
             </div>
         </div>
     </nav>

@@ -49,11 +49,12 @@ O Flask roda o sistema principal. O PHP roda o Help Desk.
 
 Importante: Flask nao executa PHP.
 
-A integracao sera feita de tres formas:
+A integracao esta sendo feita de quatro formas:
 
 1. Os dois usam o mesmo banco `farmacia.db`.
 2. Os dois devem usar o mesmo visual, reaproveitando `static/css/style.css`.
 3. A navbar do Flask tera um botao para abrir o Help Desk.
+4. O PHP consulta uma rota simples do Flask para copiar os dados basicos da sessao.
 
 Exemplo de como pode rodar:
 
@@ -72,6 +73,26 @@ php -S localhost:8000 -t .
 ```
 
 Atencao: a pasta oficial ficou `php/help_desk`. O link da navbar deve apontar para `http://localhost:8000/php/help_desk/index.php` quando o servidor PHP estiver rodando na porta 8000.
+
+### Sessao Flask dentro do PHP
+
+Foi escolhido um caminho simples para o prototipo funcional:
+
+1. O usuario faz login normalmente pelo Flask.
+2. Ao abrir o Help Desk, o PHP manda para `sincronizar_sessao.php` se ainda nao tiver sessao PHP.
+3. Essa pagina chama a rota `http://localhost:5000/api/sessao` pelo navegador.
+4. Se o Flask confirmar que existe usuario logado, o PHP salva `id`, `nome` e `cargo` em `$_SESSION`.
+5. Depois disso, o Help Desk usa a sessao PHP para saber quem abriu ou fechou o chamado.
+
+Arquivos envolvidos:
+
+- `app.py`: tem a rota `/api/sessao` para o Help Desk em `localhost:8000`;
+- `php/help_desk/sincronizar_sessao.php`: busca a sessao atual do Flask;
+- `php/help_desk/salvar_sessao.php`: valida o usuario no banco e grava a sessao PHP;
+- `php/help_desk/sair.php`: encerra a sessao PHP e depois chama o logout do Flask;
+- `php/help_desk/funcoes.php`: tem `usuario_logado_php()` e `exigir_login_php()`.
+
+Essa integracao e suficiente para o MVP, mas ainda depende dos dois servidores rodando nas portas combinadas.
 
 ---
 
@@ -267,6 +288,9 @@ O MVP funcional do Help Desk ja foi criado com:
 - `php/help_desk/salvar_chamado.php`: grava chamado no banco;
 - `php/help_desk/detalhes_chamado.php`: mostra detalhes e formulario de atualizacao;
 - `php/help_desk/atualizar_chamado.php`: atualiza status/prioridade e fecha chamado quando status for `Fechado`;
+- `php/help_desk/sincronizar_sessao.php`: sincroniza o usuario logado no Flask com a sessao PHP;
+- `php/help_desk/salvar_sessao.php`: salva a sessao PHP depois de validar o usuario no banco;
+- `php/help_desk/sair.php`: limpa a sessao PHP e envia para o logout do Flask;
 - `php/help_desk/funcoes.php`: funcoes de layout, escape HTML e badges.
 
 ---
@@ -362,9 +386,9 @@ Atencao: o `pdo_sqlite` foi habilitado no PHP deste computador. Se o projeto for
 Coisas que ainda precisam ser resolvidas:
 
 - melhorar a organizacao da mensagem da tabela `chamados` no `setup_banco.py`, pois ela aparece dentro da etapa de usuarios;
-- decidir como o PHP vai identificar o usuario logado;
+- revisar melhor o comportamento quando o usuario sai pelo Flask e depois tenta voltar direto para o PHP;
 - criar validacoes visuais melhores no formulario de atualizacao;
-- decidir se sera necessario login proprio no PHP;
+- decidir se no futuro sera necessario login proprio no PHP ou se a integracao atual sera mantida;
 - revisar textos antigos com encoding quebrado.
 
 ---

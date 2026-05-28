@@ -2,11 +2,7 @@
     require_once __DIR__ . "/../conexao.php";
     require_once __DIR__ . "/funcoes.php";
 
-    // O MVP ainda nao compartilha sessao com o Flask.
-    // Por isso o usuario que abriu o chamado e escolhido em um select.
-    $usuarios = $pdo
-        ->query("SELECT id, nome, cargo FROM usuarios ORDER BY nome ASC")
-        ->fetchAll();
+    exigir_login_php();
 
     // Renderiza o formulario de abertura.
     cabecalho("Novo chamado");
@@ -54,15 +50,10 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label for="aberto_por_id" class="form-label">Aberto por *</label>
-                    <select class="form-select" id="aberto_por_id" name="aberto_por_id" required>
-                        <option value="" disabled selected>Selecione o usuario...</option>
-                        <?php foreach ($usuarios as $usuario): ?>
-                            <option value="<?php echo escapar($usuario["id"]); ?>">
-                                <?php echo escapar($usuario["nome"]); ?> (<?php echo escapar($usuario["cargo"]); ?>)
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                    <label class="form-label">Aberto por</label>
+                    <div class="form-control bg-light">
+                        <?php echo escapar($_SESSION["user_nome"]); ?> (<?php echo escapar($_SESSION["user_cargo"]); ?>)
+                    </div>
                 </div>
             </div>
 

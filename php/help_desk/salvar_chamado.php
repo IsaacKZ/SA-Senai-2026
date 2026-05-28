@@ -1,5 +1,8 @@
 <?php
     require_once __DIR__ . "/../conexao.php";
+    require_once __DIR__ . "/funcoes.php";
+
+    exigir_login_php();
 
     // Centraliza o redirecionamento de erro para manter as validacoes mais limpas.
     function voltar_com_erro() {
@@ -19,7 +22,7 @@
     $titulo = trim($_POST["titulo"] ?? "");
     $descricao = trim($_POST["descricao"] ?? "");
     $prioridade = $_POST["prioridade"] ?? "";
-    $abertoPorId = filter_input(INPUT_POST, "aberto_por_id", FILTER_VALIDATE_INT);
+    $abertoPorId = (int) $_SESSION["user_id"];
 
     $prioridadesValidas = ["Baixa", "Media", "Alta"];
     $tituloMuitoGrande = strlen($titulo) > 100;
