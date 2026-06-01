@@ -1,10 +1,18 @@
 <?php
+    /*
+     * Tela de detalhes de um chamado.
+     *
+     * Mostra as informacoes completas e permite atualizar status/prioridade.
+     * A atualizacao em si fica no arquivo atualizar_chamado.php.
+     */
+
     require_once __DIR__ . "/../conexao.php";
     require_once __DIR__ . "/funcoes.php";
 
     exigir_login_php();
 
     // ID do chamado vindo pela URL.
+    // filter_input evita usar uma string qualquer como ID.
     $chamadoId = filter_input(INPUT_GET, "id", FILTER_VALIDATE_INT);
 
     if (!$chamadoId) {
@@ -13,6 +21,7 @@
     }
 
     // Busca o chamado junto com o nome de quem abriu e de quem fechou.
+    // LEFT JOIN no fechado porque um chamado aberto ainda nao tem fechador.
     $consultaChamado = $pdo->prepare("
         SELECT
             c.*,
@@ -95,8 +104,10 @@
 
             <div class="card-body">
                 <form method="POST" action="atualizar_chamado.php">
+                    <!-- ID oculto: informa ao processador qual chamado sera atualizado. -->
                     <input type="hidden" name="id" value="<?php echo escapar($chamado["id"]); ?>">
 
+                    <!-- As opcoes precisam bater com os valores permitidos no banco. -->
                     <div class="mb-3">
                         <label for="status" class="form-label">Status</label>
                         <select class="form-select" id="status" name="status" required>
@@ -108,6 +119,7 @@
                         </select>
                     </div>
 
+                    <!-- Prioridade atual do chamado. -->
                     <div class="mb-3">
                         <label for="prioridade" class="form-label">Prioridade</label>
                         <select class="form-select" id="prioridade" name="prioridade" required>
@@ -119,6 +131,7 @@
                         </select>
                     </div>
 
+                    <!-- Se o status virar Fechado, este usuario sera salvo como responsavel. -->
                     <div class="mb-3">
                         <label class="form-label">Usuario atual</label>
                         <div class="form-control bg-light">

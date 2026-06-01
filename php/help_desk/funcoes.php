@@ -1,20 +1,34 @@
 <?php
+    /*
+     * Funcoes compartilhadas do Help Desk.
+     *
+     * Este arquivo evita repetir codigo de sessao, layout, escape de HTML,
+     * formatacao de datas e badges em todas as paginas PHP.
+     */
+
+    // As telas do Help Desk usam sessao PHP propria.
+    // Ela e sincronizada com a sessao Flask em sincronizar_sessao.php.
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
 
-    // Endereco do sistema Flask. O modulo PHP usa esses links para voltar ao sistema principal.
+    // Endereco do sistema Flask. Usado nos links da navbar e no logout.
     const URL_SISTEMA_FLASK = "http://localhost:5000";
 
-    // Evita que textos vindos do banco sejam interpretados como HTML na tela.
+    // Escape padrao para qualquer texto exibido na tela.
+    // Pense nisso como "mostrar como texto", nao "executar como HTML".
     function escapar($valor) {
         return htmlspecialchars((string) $valor, ENT_QUOTES, "UTF-8");
     }
 
+    // O PHP considera o usuario logado quando a sincronizacao ja copiou
+    // o ID do usuario Flask para $_SESSION.
     function usuario_logado_php() {
         return !empty($_SESSION["user_id"]);
     }
 
+    // Protege paginas internas do Help Desk.
+    // Se ainda nao existir sessao PHP, tenta sincronizar com o Flask.
     function exigir_login_php() {
         if (!usuario_logado_php()) {
             header("Location: sincronizar_sessao.php");
@@ -22,7 +36,7 @@
         }
     }
 
-    // Padroniza a exibicao das datas do SQLite.
+    // Padroniza a exibicao das datas vindas do SQLite.
     function formatar_data($data) {
         if (empty($data)) {
             return "-";
@@ -31,7 +45,8 @@
         return date("d/m/Y H:i", strtotime($data));
     }
 
-    // Define a cor visual de cada status na listagem e nos detalhes.
+    // Cria o badge visual de status.
+    // O valor ainda e escapado antes de ir para a tela.
     function badge_status($status) {
         $cores = [
             "Aberto" => "bg-primary",
@@ -44,7 +59,7 @@
         return "<span class=\"badge {$classe}\">" . escapar($status) . "</span>";
     }
 
-    // Define a cor visual de cada prioridade.
+    // Cria o badge visual de prioridade.
     function badge_prioridade($prioridade) {
         $cores = [
             "Baixa" => "bg-success",
@@ -57,6 +72,7 @@
     }
 
     // Mostra mensagens simples apos criar, atualizar ou falhar em alguma operacao.
+    // A pagina so passa um codigo curto pela URL, por exemplo: ?msg=criado.
     function mostrar_mensagem() {
         $mensagens = [
             "criado" => ["success", "Chamado aberto com sucesso!"],
@@ -79,8 +95,12 @@
 <?php
     }
 
-    // Cabecalho reaproveitado nas telas do Help Desk.
-    // Mantem o visual parecido com o Flask, mas sem depender dos templates Jinja.
+    /*
+     * Cabecalho reaproveitado nas telas do Help Desk.
+     *
+     * O Flask usa Jinja, mas o PHP nao entende templates Jinja.
+     * Por isso este cabecalho replica a navbar e inclui o mesmo CSS.
+     */
     function cabecalho($tituloPagina) {
 ?>
 <!DOCTYPE html>

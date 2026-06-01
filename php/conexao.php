@@ -1,22 +1,32 @@
 <?php
-    // __DIR__ representa a pasta atual
+    /*
+     * Conexao central do modulo PHP.
+     *
+     * O Help Desk nao tem um banco separado: ele usa o mesmo farmacia.db
+     * do sistema Flask. Por isso qualquer tela PHP que precise do banco
+     * inclui este arquivo e passa a usar a variavel $pdo.
+     */
+
+    // __DIR__ aqui aponta para a pasta /php.
+    // O banco fica uma pasta acima, na raiz do projeto.
     $caminhoBanco = __DIR__ . "/../farmacia.db";
 
     try {
-        // Cria a conexao com o banco SQLite.
+        // No SQLite a "conexao" aponta para um arquivo, nao para host/usuario/senha.
         $pdo = new PDO("sqlite:" . $caminhoBanco);
 
-        // Se der erro em alguma consulta SQL, o PDO lanca uma excecao.
+        // Faz o PDO lancar excecoes quando uma consulta falhar.
+        // Isso deixa o erro mais claro durante o desenvolvimento.
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        // Faz os resultados das consultas retornarem como array associativo.
+        // Retorna resultados como array associativo.
         // Exemplo: $usuario["nome"] em vez de $usuario[0].
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
-        // Ativa o uso de chaves estrangeiras no SQLite.
+        // SQLite so respeita FOREIGN KEY se isso estiver ativado por conexao.
         $pdo->exec("PRAGMA foreign_keys = ON");
     } catch (PDOException $e) {
-        // Encerra a execucao e mostra o erro caso a conexao falhe.
+        // Se o banco nao abrir, nenhuma pagina do Help Desk consegue continuar.
         die("Erro na conexao: " . $e->getMessage());
     }
 ?>

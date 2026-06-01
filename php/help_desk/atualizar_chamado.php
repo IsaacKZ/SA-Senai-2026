@@ -1,4 +1,12 @@
 <?php
+    /*
+     * Processa a atualizacao de status/prioridade de um chamado.
+     *
+     * Regras importantes:
+     * - Se o status virar "Fechado", salva quem fechou e a data.
+     * - Se o chamado sair de "Fechado", limpa a data e o usuario de fechamento.
+     */
+
     require_once __DIR__ . "/../conexao.php";
     require_once __DIR__ . "/funcoes.php";
 
@@ -33,11 +41,12 @@
     $statusValidos = ["Aberto", "Em andamento", "Resolvido", "Fechado"];
     $prioridadesValidas = ["Baixa", "Media", "Alta"];
 
-    // Validacoes de entrada antes do UPDATE.
+    // Sem ID valido nao sabemos qual chamado atualizar.
     if (!$chamadoId) {
         voltar_para_lista();
     }
 
+    // Status e prioridade precisam bater com o CHECK da tabela chamados.
     if (!in_array($status, $statusValidos, true) || !in_array($prioridade, $prioridadesValidas, true)) {
         voltar_para_chamado($chamadoId);
     }
@@ -48,6 +57,7 @@
             voltar_para_chamado($chamadoId);
         }
 
+        // COALESCE mantem a data original se o chamado ja estava fechado.
         $consulta = $pdo->prepare("
             UPDATE chamados
             SET status = ?,

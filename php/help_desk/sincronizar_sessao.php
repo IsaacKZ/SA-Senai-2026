@@ -1,4 +1,12 @@
 <?php
+    /*
+     * Sincronizacao de sessao Flask -> PHP.
+     *
+     * Flask e PHP nao compartilham sessao automaticamente. Esta pagina
+     * pergunta ao Flask quem esta logado e, se o Flask confirmar, manda
+     * esses dados para salvar_sessao.php criar a sessao PHP.
+     */
+
     require_once __DIR__ . "/funcoes.php";
 
     $houveErro = isset($_GET["erro"]);
@@ -24,6 +32,8 @@
 <script>
     async function sincronizarSessao() {
         try {
+            // 1. Pergunta ao Flask se existe usuario logado.
+            // credentials: "include" envia o cookie da sessao Flask junto.
             const respostaFlask = await fetch("<?php echo URL_SISTEMA_FLASK; ?>/api/sessao", {
                 credentials: "include"
             });
@@ -35,11 +45,13 @@
 
             const sessao = await respostaFlask.json();
 
+            // Defesa simples: mesmo com HTTP 200, a resposta precisa dizer que logou.
             if (!sessao.logado) {
                 window.location.href = "<?php echo URL_SISTEMA_FLASK; ?>/login";
                 return;
             }
 
+            // 2. Envia os dados confirmados pelo Flask para o PHP criar $_SESSION.
             const respostaPhp = await fetch("salvar_sessao.php", {
                 method: "POST",
                 headers: {
@@ -53,8 +65,10 @@
                 return;
             }
 
+            // 3. Com a sessao PHP criada, volta para a listagem do Help Desk.
             window.location.href = "index.php";
         } catch (erro) {
+            // Qualquer falha de rede/servidor cai na tela de erro amigavel.
             window.location.href = "sincronizar_sessao.php?erro=1";
         }
     }

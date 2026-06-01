@@ -1,4 +1,11 @@
 <?php
+    /*
+     * Formulario para abrir um novo chamado.
+     *
+     * Esta tela so monta o formulario. A gravacao no banco acontece em
+     * salvar_chamado.php, para manter exibicao e processamento separados.
+     */
+
     require_once __DIR__ . "/../conexao.php";
     require_once __DIR__ . "/funcoes.php";
 
@@ -28,17 +35,20 @@
 
     <div class="card-body">
         <form method="POST" action="salvar_chamado.php">
+            <!-- Titulo curto para aparecer bem na tabela de chamados. -->
             <div class="mb-3">
                 <label for="titulo" class="form-label">Titulo *</label>
                 <input type="text" class="form-control" id="titulo" name="titulo" maxlength="100" required>
             </div>
 
+            <!-- Descricao livre do problema ou solicitacao. -->
             <div class="mb-3">
                 <label for="descricao" class="form-label">Descricao *</label>
                 <textarea class="form-control" id="descricao" name="descricao" rows="5" required></textarea>
             </div>
 
             <div class="row">
+                <!-- As prioridades abaixo precisam bater com o CHECK da tabela chamados. -->
                 <div class="col-md-6 mb-3">
                     <label for="prioridade" class="form-label">Prioridade *</label>
                     <select class="form-select" id="prioridade" name="prioridade" required>
@@ -49,6 +59,7 @@
                     </select>
                 </div>
 
+                <!-- O usuario vem da sessao PHP sincronizada com o Flask. -->
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Aberto por</label>
                     <div class="form-control bg-light">

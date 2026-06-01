@@ -1,10 +1,18 @@
 <?php
+    /*
+     * Tela inicial do Help Desk.
+     *
+     * Mostra os contadores por status e a tabela principal de chamados.
+     * Tambem permite filtrar a listagem clicando nos cards de status.
+     */
+
     require_once __DIR__ . "/../conexao.php";
     require_once __DIR__ . "/funcoes.php";
 
     exigir_login_php();
 
-    // Status aceitos pelo banco. Qualquer outro valor na URL e ignorado.
+    // Status aceitos pelo banco.
+    // Se vier qualquer outro valor pela URL, o filtro e ignorado.
     $statusValidos = ["Aberto", "Em andamento", "Resolvido", "Fechado"];
     $statusSelecionado = $_GET["status"] ?? "";
     $temFiltroStatus = in_array($statusSelecionado, $statusValidos, true);
@@ -17,6 +25,7 @@
         "Fechado" => 0,
     ];
 
+    // Busca quantos chamados existem em cada status.
     $consultaTotais = $pdo->query("SELECT status, COUNT(*) AS total FROM chamados GROUP BY status");
 
     // Preenche os totais que existem no banco.
@@ -43,6 +52,7 @@
 
     $sql .= " ORDER BY c.data_aberto DESC";
 
+    // Mesmo quando nao ha filtro, usar prepare mantem o padrao do projeto.
     $consultaChamados = $pdo->prepare($sql);
 
     if ($temFiltroStatus) {
@@ -71,7 +81,7 @@
 
 <?php mostrar_mensagem(); ?>
 
-<!-- Cards de resumo e atalho por status -->
+<!-- Cards de resumo: cada card tambem serve como atalho de filtro. -->
 <div class="row mb-4">
     <div class="col-md-3 mb-3">
         <a href="index.php?status=Aberto" class="text-decoration-none">
@@ -122,7 +132,7 @@
     </div>
 </div>
 
-<!-- Lista principal de chamados -->
+<!-- Lista principal: mostra todos os chamados ou apenas o status filtrado. -->
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <span>
