@@ -62,17 +62,19 @@ Exemplo de como pode rodar:
 Flask:
 http://localhost:5000
 
-PHP:
-http://localhost:8000/php/help_desk/
+PHP pelo XAMPP:
+http://localhost:9999/SA-Senai-2026/php/help_desk/
 ```
 
-Para testar PHP, posso usar:
+Para testar PHP no ambiente atual, estou usando o Apache do XAMPP na porta 9999.
 
-```bash
-php -S localhost:8000 -t .
+A copia ativa do projeto fica em:
+
+```text
+C:\xampp\htdocs\SA-Senai-2026
 ```
 
-Atencao: a pasta oficial ficou `php/help_desk`. O link da navbar deve apontar para `http://localhost:8000/php/help_desk/index.php` quando o servidor PHP estiver rodando na porta 8000.
+Atencao: a pasta oficial ficou `php/help_desk`. Com XAMPP na porta 9999, o link da navbar deve apontar para `http://localhost:9999/SA-Senai-2026/php/help_desk/index.php`.
 
 ### Sessao Flask dentro do PHP
 
@@ -86,13 +88,13 @@ Foi escolhido um caminho simples para o prototipo funcional:
 
 Arquivos envolvidos:
 
-- `app.py`: tem a rota `/api/sessao` para o Help Desk em `localhost:8000`;
+- `app.py`: tem a rota `/api/sessao` e libera CORS para o Help Desk em `localhost:9999`;
 - `php/help_desk/sincronizar_sessao.php`: busca a sessao atual do Flask;
 - `php/help_desk/salvar_sessao.php`: valida o usuario no banco e grava a sessao PHP;
 - `php/help_desk/sair.php`: encerra a sessao PHP e depois chama o logout do Flask;
 - `php/help_desk/funcoes.php`: tem `usuario_logado_php()` e `exigir_login_php()`.
 
-Essa integracao e suficiente para o MVP, mas ainda depende dos dois servidores rodando nas portas combinadas.
+Essa integracao e suficiente para o MVP, mas ainda depende dos dois servidores rodando nas portas combinadas: Flask em `localhost:5000` e PHP/XAMPP em `localhost:9999`.
 
 ---
 
@@ -202,7 +204,7 @@ O item usa o icone:
 <i class="bi bi-headset"></i> Help Desk
 ```
 
-O link foi ajustado para `http://localhost:8000/php/help_desk/index.php`.
+O link foi ajustado para `http://localhost:9999/SA-Senai-2026/php/help_desk/index.php`.
 
 ---
 
@@ -398,3 +400,4 @@ Coisas que ainda precisam ser resolvidas:
 Este projeto comecou como uma S.A. de farmacia no segundo semestre, feita em Flask com SQLite. Ele controla usuarios, produtos, lotes, validade, vendas e regras para medicamentos controlados.
 
 No terceiro semestre, estou estendendo esse mesmo sistema com um modulo de Help Desk em PHP. O objetivo e mostrar continuidade do projeto, reaproveitando o banco, o visual e a estrutura ja existente, mas adicionando uma nova funcionalidade.
+

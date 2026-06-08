@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Sistema de Farmácia{% endblock %} - Vida Saudável</title>
+    <title>{% block title %}Sistema de FarmÃ¡cia{% endblock %} - Vida SaudÃ¡vel</title>
 
     <!-- Bootstrap 5 CSS (CDN) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -20,22 +20,22 @@
 
 <body>
 
-    <!-- ===== NAVBAR (Verde Farmácia) ===== -->
+    <!-- ===== NAVBAR (Verde FarmÃ¡cia) ===== -->
     {% if session.user_id %}
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
         <div class="container-fluid">
             <!-- Brand/Logo -->
             <a class="navbar-brand" href="{{ url_for('dashboard') }}">
                 <i class="bi bi-heart-pulse-fill"></i>
-                <strong>Farmácia Vida Saudável</strong>
+                <strong>FarmÃ¡cia Vida SaudÃ¡vel</strong>
             </a>
 
-            <!-- Botão Mobile -->
+            <!-- BotÃ£o Mobile -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <!-- Menu de Navegação -->
+            <!-- Menu de NavegaÃ§Ã£o -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
@@ -55,21 +55,21 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('relatorios') }}">
-                            <i class="bi bi-file-earmark-bar-graph"></i> Relatórios
+                            <i class="bi bi-file-earmark-bar-graph"></i> RelatÃ³rios
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="http://localhost:8000/php/help_desk/index.php">
+                        <a class="nav-link" href="http://localhost:9999/SA-Senai-2026/php/help_desk/index.php">
                             <i class="bi bi-headset"></i> Help Desk
                         </a>
                     </li>
                 </ul>
 
-                <!-- Direita: Usuário + Logout -->
+                <!-- Direita: UsuÃ¡rio + Logout -->
                 <div class="d-flex align-items-center">
                     <span class="text-white me-3">
                         <i class="bi bi-person-circle"></i>
-                        Olá, <strong>{{ session.user_nome }}</strong>
+                        OlÃ¡, <strong>{{ session.user_nome }}</strong>
                         <span class="badge bg-light text-dark ms-1">{{ session.user_cargo }}</span>
                     </span>
                     <a href="{{ url_for('logout') }}" class="btn btn-logout">
@@ -104,7 +104,7 @@
     {% endif %}
     {% endwith %}
 
-    <!-- ===== CONTEÚDO PRINCIPAL (Bloco dinâmico) ===== -->
+    <!-- ===== CONTEÃšDO PRINCIPAL (Bloco dinÃ¢mico) ===== -->
     <main class="{% if session.user_id %}container-fluid{% endif %} mt-4">
         {% block content %}{% endblock %}
     </main>
@@ -114,7 +114,7 @@
     <footer class="footer mt-5">
         <div class="container">
             <p class="mb-0">
-                &copy; 2025 Farmácia Vida Saudável - Todos os direitos reservados
+                &copy; 2025 FarmÃ¡cia Vida SaudÃ¡vel - Todos os direitos reservados
             </p>
         </div>
     </footer>
@@ -130,3 +130,4 @@
 </body>
 
 </html>
+
