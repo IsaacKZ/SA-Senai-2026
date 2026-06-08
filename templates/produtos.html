@@ -49,11 +49,17 @@
                             data-produto-nome="{{ produto.nome }}">
                             <i class="bi bi-plus-circle"></i> Adicionar Lote
                         </button>
-                        <button class="btn btn-warning btn-sm"
-                            onclick="abrirModalEditar(event, {{ produto.id }}, '{{ produto.nome }}', '{{ produto.fabricante }}', '{{ produto.categoria }}', {{ produto.preco_venda }}, '{{ produto.descricao|default("", true) }}')">
+                        <button class="btn btn-warning btn-sm btn-editar-produto"
+                            data-produto-id="{{ produto.id }}"
+                            data-produto-nome="{{ produto.nome|e }}"
+                            data-produto-fabricante="{{ produto.fabricante|e }}"
+                            data-produto-categoria="{{ produto.categoria|e }}"
+                            data-produto-preco="{{ produto.preco_venda }}"
+                            data-produto-descricao="{{ produto.descricao|default('', true)|e }}">
                             <i class="bi bi-pencil"></i> Editar Produto
                         </button>
-                        <button class="btn btn-danger btn-sm" onclick="deletarProduto(event, {{ produto.id }})">
+                        <button class="btn btn-danger btn-sm btn-deletar-produto"
+                            data-produto-id="{{ produto.id }}">
                             <i class="bi bi-trash"></i> Excluir Produto
                         </button>
                     </div>
@@ -123,7 +129,7 @@
                             <option value="">Selecione...</option>
                             <option value="Comum">Comum</option>
                             <option value="Controlado">Controlado (Tarja Preta)</option>
-                            <option value="Antibiótico">Antibiótico</option>
+                            <option value="Antibiotico">Antibiótico</option>
                             <option value="Higiene">Higiene e Beleza</option>
                         </select>
                     </div>
@@ -303,6 +309,19 @@
                 const produtoNome = btn.dataset.produtoNome;
                 abrirModalLote(produtoId, produtoNome);
             }
+
+            const btnEditar = e.target.closest('.btn-editar-produto');
+            if (btnEditar) {
+                e.stopPropagation();
+                abrirModalEditar(btnEditar);
+                return;
+            }
+
+            const btnDeletar = e.target.closest('.btn-deletar-produto');
+            if (btnDeletar) {
+                e.stopPropagation();
+                deletarProduto(btnDeletar.dataset.produtoId);
+            }
         });
     });
 
@@ -379,15 +398,13 @@
 
     // ===== FUNÇÕES DE EDIÇÃO E EXCLUSÃO =====
 
-    function abrirModalEditar(event, id, nome, fabricante, categoria, preco, descricao) {
-        event.stopPropagation(); // Impede que o accordion abra/feche
-
-        document.getElementById('edit_produto_id').value = id;
-        document.getElementById('edit_nome').value = nome;
-        document.getElementById('edit_fabricante').value = fabricante;
-        document.getElementById('edit_categoria').value = categoria;
-        document.getElementById('edit_preco_venda').value = preco;
-        document.getElementById('edit_descricao').value = descricao;
+    function abrirModalEditar(botao) {
+        document.getElementById('edit_produto_id').value = botao.dataset.produtoId;
+        document.getElementById('edit_nome').value = botao.dataset.produtoNome;
+        document.getElementById('edit_fabricante').value = botao.dataset.produtoFabricante;
+        document.getElementById('edit_categoria').value = botao.dataset.produtoCategoria;
+        document.getElementById('edit_preco_venda').value = botao.dataset.produtoPreco;
+        document.getElementById('edit_descricao').value = botao.dataset.produtoDescricao;
 
         const modal = new bootstrap.Modal(document.getElementById('modalEditarProduto'));
         modal.show();
@@ -427,9 +444,7 @@
         }
     }
 
-    async function deletarProduto(event, id) {
-        event.stopPropagation(); // Impede accordion
-
+    async function deletarProduto(id) {
         if (confirm('Tem certeza que deseja excluir este produto? Esta ação não pode ser desfeita.')) {
             try {
                 const response = await fetch(`/api/produtos/${id}`, {
