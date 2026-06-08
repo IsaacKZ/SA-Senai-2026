@@ -183,7 +183,7 @@
 ?>
     </main>
 
-    <footer class="footer mt-5">
+    <footer class="footer">
         <div class="container">
             <p class="mb-0">&copy; 2026 Farmacia Vida Saudavel - Help Desk</p>
         </div>

@@ -12,10 +12,21 @@
     --text-light: #757575;
 }
 
+html {
+    min-height: 100%;
+}
+
 body {
+    min-height: 100vh;
     background-color: var(--background-color);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: var(--text-dark);
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
 }
 
 /* ===== NAVBAR ===== */
@@ -357,7 +368,8 @@ body {
     color: white;
     padding: 20px;
     text-align: center;
-    margin-top: 50px;
+    margin-top: auto;
+    flex-shrink: 0;
 }
 
 /* ===== RESPONSIVIDADE ===== */

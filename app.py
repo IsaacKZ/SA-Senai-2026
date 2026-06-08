@@ -1,19 +1,19 @@
-﻿from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from functools import wraps
 import os
 from datetime import datetime
 
-# ImportaÃ§Ãµes locais
+# Importações locais
 from config import Config
 import db
 
 """
-SISTEMA DE GESTÃƒO FARMACÃŠUTICA
+SISTEMA DE GESTÃO FARMACÊUTICA
 Flask Principal
 Arquivo: app.py
 """
 
-# CONFIGURAÃ‡ÃƒO DA APLICAÃ‡ÃƒO FLASK
+# CONFIGURAÇÃO DA APLICAÇÃO FLASK
 # =====================================================
 
 app = Flask(__name__)
@@ -40,7 +40,7 @@ def permitir_help_desk_php(response):
 
 @app.template_filter('format_date')
 def format_date_filter(value, format='%d/%m/%Y'):
-    """Formata data para exibiÃ§Ã£o. Aceita string ou datetime."""
+    """Formata data para exibição. Aceita string ou datetime."""
     if value is None:
         return ''
     if isinstance(value, str):
@@ -56,49 +56,49 @@ def format_date_filter(value, format='%d/%m/%Y'):
 
 @app.template_filter('format_datetime')
 def format_datetime_filter(value, format='%d/%m/%Y %H:%M'):
-    """Formata data/hora para exibiÃ§Ã£o."""
+    """Formata data/hora para exibição."""
     return format_date_filter(value, format)
 
 # =====================================================
-# DECORADOR DE AUTENTICAÃ‡ÃƒO (Proteger Rotas)
+# DECORADOR DE AUTENTICAÇÃO (Proteger Rotas)
 # =====================================================
 
 def login_required(f):
     """
-    Decorador para proteger rotas que exigem autenticaÃ§Ã£o.
-    Redireciona para /login se usuÃ¡rio nÃ£o estiver na sessÃ£o.
+    Decorador para proteger rotas que exigem autenticação.
+    Redireciona para /login se usuário não estiver na sessão.
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
-            flash('VocÃª precisa fazer login para acessar esta pÃ¡gina.', 'warning')
+            flash('Você precisa fazer login para acessar esta página.', 'warning')
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
 
 # =====================================================
-# ROTAS: AUTENTICAÃ‡ÃƒO
+# ROTAS: AUTENTICAÇÃO
 # =====================================================
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """
     Tela de login do sistema.
-    GET: Exibe formulÃ¡rio
-    POST: Valida credenciais e inicia sessÃ£o
+    GET: Exibe formulário
+    POST: Valida credenciais e inicia sessão
     """
-    # Se jÃ¡ estiver logado, redireciona para dashboard
+    # Se já estiver logado, redireciona para dashboard
     if 'user_id' in session:
         return redirect(url_for('dashboard'))
     
-    # Buscar lista de usuÃ¡rios para o dropdown
+    # Buscar lista de usuários para o dropdown
     usuarios = db.listar_usuarios()
     
     if request.method == 'POST':
         login_usuario = request.form.get('login')
         senha = request.form.get('senha')
         
-        # ValidaÃ§Ã£o bÃ¡sica
+        # Validação básica
         if not login_usuario or not senha:
             flash('Preencha todos os campos!', 'danger')
             return render_template('login.html', usuarios=usuarios)
@@ -107,7 +107,7 @@ def login():
         usuario = db.verificar_login(login_usuario, senha)
         
         if usuario:
-            # Autenticado com sucesso - Criar sessÃ£o
+            # Autenticado com sucesso - Criar sessão
             session['user_id'] = usuario['id']
             session['user_nome'] = usuario['nome']
             session['user_cargo'] = usuario['cargo']
@@ -116,20 +116,20 @@ def login():
             flash(f'Bem-vindo(a), {usuario["nome"]}!', 'success')
             return redirect(url_for('dashboard'))
         else:
-            # Credenciais invÃ¡lidas
-            flash('UsuÃ¡rio ou senha incorretos!', 'danger')
+            # Credenciais inválidas
+            flash('Usuário ou senha incorretos!', 'danger')
     
     return render_template('login.html', usuarios=usuarios)
 
 @app.route('/logout')
 def logout():
-    """Encerra a sessÃ£o do usuÃ¡rio e redireciona para login"""
+    """Encerra a sessão do usuário e redireciona para login"""
     session.clear()
-    flash('VocÃª saiu do sistema.', 'info')
+    flash('Você saiu do sistema.', 'info')
     return redirect(url_for('login'))
 
 # =====================================================
-# ROTAS: NAVEGAÃ‡ÃƒO PRINCIPAL
+# ROTAS: NAVEGAÇÃO PRINCIPAL
 # =====================================================
 
 @app.route('/api/sessao')
@@ -148,7 +148,7 @@ def api_sessao():
 @app.route('/')
 def index():
     """
-    Rota raiz - Redireciona conforme estado de autenticaÃ§Ã£o
+    Rota raiz - Redireciona conforme estado de autenticação
     """
     if 'user_id' in session:
         return redirect(url_for('dashboard'))
@@ -176,14 +176,14 @@ def dashboard():
         return render_template('dashboard.html', lotes_vencendo=[], vendas_recentes=[])
 
 # =====================================================
-# ROTAS: GESTÃƒO DE PRODUTOS E ESTOQUE
+# ROTAS: GESTÃO DE PRODUTOS E ESTOQUE
 # =====================================================
 
 @app.route('/produtos')
 @login_required
 def produtos():
     """
-    Tela de gestÃ£o de produtos e lotes.
+    Tela de gestão de produtos e lotes.
     Exibe lista em formato Accordion (Bootstrap).
     """
     try:
@@ -207,9 +207,9 @@ def criar_produto():
         preco_venda = request.form.get('preco_venda')
         descricao = request.form.get('descricao', '')
         
-        # ValidaÃ§Ã£o
+        # Validação
         if not all([nome, fabricante, categoria, preco_venda]):
-            return jsonify({'success': False, 'message': 'Preencha todos os campos obrigatÃ³rios'}), 400
+            return jsonify({'success': False, 'message': 'Preencha todos os campos obrigatórios'}), 400
         
         produto_id = db.criar_produto(nome, fabricante, categoria, float(preco_venda), descricao)
         
@@ -265,7 +265,7 @@ def deletar_produto(produto_id):
 @app.route('/api/lotes/produto/<int:produto_id>', methods=['GET'])
 @login_required
 def listar_lotes(produto_id):
-    """API para listar lotes de um produto especÃ­fico"""
+    """API para listar lotes de um produto específico"""
     try:
         lotes = db.listar_lotes_por_produto(produto_id)
         return jsonify({'success': True, 'lotes': lotes})
@@ -285,7 +285,7 @@ def criar_lote():
         data_validade = request.form.get('data_validade')
         qtd_atual = request.form.get('qtd_atual')
         
-        # ValidaÃ§Ã£o
+        # Validação
         if not all([produto_id, numero_lote, data_validade, qtd_atual]):
             return jsonify({'success': False, 'message': 'Preencha todos os campos'}), 400
         
@@ -309,10 +309,10 @@ def criar_lote():
 def pdv():
     """
     Tela de Ponto de Venda (Frente de Caixa).
-    Layout Split Screen: CatÃ¡logo + Carrinho
+    Layout Split Screen: Catálogo + Carrinho
     """
     try:
-        # Buscar produtos disponÃ­veis (com estoque > 0)
+        # Buscar produtos disponíveis (com estoque > 0)
         produtos_disponiveis = db.listar_produtos()
         # Filtrar apenas produtos com estoque
         produtos_disponiveis = [p for p in produtos_disponiveis if p['estoque_total'] > 0]
@@ -327,14 +327,14 @@ def pdv():
 def produto_detalhes(produto_id):
     """
     API para obter detalhes completos de um produto (incluindo dados completos).
-    Usado no PDV para verificar categoria (Controlado ou nÃ£o).
+    Usado no PDV para verificar categoria (Controlado ou não).
     """
     try:
         produto = db.get_produto_por_id(produto_id)
         if produto:
             return jsonify({'success': True, 'produto': produto})
         else:
-            return jsonify({'success': False, 'message': 'Produto nÃ£o encontrado'}), 404
+            return jsonify({'success': False, 'message': 'Produto não encontrado'}), 404
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
@@ -343,8 +343,8 @@ def produto_detalhes(produto_id):
 def finalizar_venda():
     """
     API para processar venda completa.
-    RN1: Valida receita mÃ©dica se houver medicamento controlado.
-    RN3: Usa lÃ³gica FEFO (First Expire, First Out) via db.get_lote_fefo()
+    RN1: Valida receita médica se houver medicamento controlado.
+    RN3: Usa lógica FEFO (First Expire, First Out) via db.get_lote_fefo()
     """
     try:
         # Dados do carrinho (JSON)
@@ -360,7 +360,7 @@ def finalizar_venda():
         import json
         itens_carrinho = json.loads(itens_json)
         
-        # ValidaÃ§Ã£o RN1: Se tem item controlado, DEVE ter receita e supervisor
+        # Validação RN1: Se tem item controlado, DEVE ter receita e supervisor
         tem_controlado = any(item.get('categoria') == 'Controlado' for item in itens_carrinho)
         
         if tem_controlado:
@@ -368,7 +368,7 @@ def finalizar_venda():
             if not arquivo_receita:
                 return jsonify({
                     'success': False, 
-                    'message': 'Medicamento controlado requer upload da receita mÃ©dica!'
+                    'message': 'Medicamento controlado requer upload da receita médica!'
                 }), 400
             
             # Verificar se senha do supervisor foi informada
@@ -382,17 +382,17 @@ def finalizar_venda():
             if supervisor != Config.SENHA_SUPERVISOR_MESTRA:
                 return jsonify({
                     'success': False, 
-                    'message': 'Senha do supervisor incorreta! Verifique maiÃºsculas e minÃºsculas.'
+                    'message': 'Senha do supervisor incorreta! Verifique maiúsculas e minúsculas.'
                 }), 403
         
-        # Validar upload de receita (se houver) - NÃƒO salva, sÃ³ valida
+        # Validar upload de receita (se houver) - NÃO salva, só valida
         if arquivo_receita:
             if not Config.allowed_file(arquivo_receita.filename):
                 return jsonify({
                     'success': False,
-                    'message': 'Formato de arquivo invÃ¡lido. Use PDF, JPG ou PNG.'
+                    'message': 'Formato de arquivo inválido. Use PDF, JPG ou PNG.'
                 }), 400
-            # Arquivo validado - descartado (nÃ£o salva)
+            # Arquivo validado - descartado (não salva)
         
         # Preparar itens para db.registrar_venda()
         # RN3: Para cada produto, buscar lote FEFO automaticamente
@@ -439,15 +439,15 @@ def finalizar_venda():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 # =====================================================
-# ROTAS: RELATÃ“RIOS
+# ROTAS: RELATÓRIOS
 # =====================================================
 
 @app.route('/relatorios')
 @login_required
 def relatorios():
     """
-    Tela de relatÃ³rios gerenciais.
-    Demonstra JOINs complexos e agregaÃ§Ãµes (critÃ©rio de avaliaÃ§Ã£o).
+    Tela de relatórios gerenciais.
+    Demonstra JOINs complexos e agregações (critério de avaliação).
     """
     try:
         vendas_recentes = db.get_vendas_recentes(limite=20)
@@ -457,35 +457,35 @@ def relatorios():
             vendas=vendas_recentes,
             lotes_vencendo=lotes_vencendo)
     except Exception as e:
-        flash(f'Erro ao carregar relatÃ³rios: {str(e)}', 'danger')
+        flash(f'Erro ao carregar relatórios: {str(e)}', 'danger')
         return render_template('relatorios.html', vendas=[], lotes_vencendo=[])
 
 # =====================================================
-# TRATAMENTO DE ERROS (UX - CritÃ©rio de AvaliaÃ§Ã£o)
+# TRATAMENTO DE ERROS (UX - Critério de Avaliação)
 # =====================================================
 
 @app.errorhandler(404)
 def page_not_found(e):
-    """PÃ¡gina customizada para erro 404"""
+    """Página customizada para erro 404"""
     return render_template('404.html'), 404
 
 @app.errorhandler(500)
 def internal_error(e):
-    """PÃ¡gina customizada para erro 500"""
+    """Página customizada para erro 500"""
     flash('Ocorreu um erro interno. Tente novamente.', 'danger')
     return redirect(url_for('dashboard'))
 
 # =====================================================
-# EXECUÃ‡ÃƒO DA APLICAÃ‡ÃƒO
+# EXECUÇÃO DA APLICAÇÃO
 # =====================================================
 
 if __name__ == '__main__':
-    # Criar pastas necessÃ¡rias se nÃ£o existirem
+    # Criar pastas necessárias se não existirem
     os.makedirs('static/css', exist_ok=True)
     os.makedirs('static/js', exist_ok=True)
     
     print("\n" + "="*50)
-    print("SISTEMA DE GESTÃƒO FARMACÃŠUTICA")
+    print("SISTEMA DE GESTÃO FARMACÊUTICA")
     print("="*50)
     print(f"Banco de dados: {Config.DATABASE_PATH}")
     print("="*50)
