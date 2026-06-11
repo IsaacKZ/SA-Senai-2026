@@ -35,7 +35,7 @@ def permitir_help_desk_php(response):
     return response
 
 # =====================================================
-# FILTRO JINJA PARA DATAS (SQLite retorna strings)
+# FILTRO PARA DATAS (SQLite retorna strings)
 # =====================================================
 
 @app.template_filter('format_date')
@@ -60,7 +60,7 @@ def format_datetime_filter(value, format='%d/%m/%Y %H:%M'):
     return format_date_filter(value, format)
 
 # =====================================================
-# DECORADOR DE AUTENTICAÇÃO (Proteger Rotas)
+# PROTEGER ROTAS
 # =====================================================
 
 def login_required(f):
